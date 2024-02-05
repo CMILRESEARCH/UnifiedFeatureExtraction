@@ -3,6 +3,8 @@ import os
 from modules.dsa import DSA
 from modules.slide import Slide
 
+from modules.pipelines import *
+
 import argparse
 
 parser = argparse.ArgumentParser(
@@ -26,6 +28,8 @@ parser.add_argument('--masked', help='Apply ftu mask on patch')
 parser.add_argument('--fixedSize', help='Extract fixed sized with max w and h')     
 
 args = parser.parse_args()
+
+
 
 if __name__=='__main__':
     config = {
