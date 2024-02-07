@@ -7,6 +7,8 @@ import numpy as np
 import os
 import logging
 
+from modules.ftu import FTU, Tubule
+
 import numpy as np
 
 import argparse
@@ -90,22 +92,15 @@ class DSAItem(DSA):
             except:
                 pass
 
-    def getFTUs(self):
+    def getTubules(self):
 
-        self.ftus = {}
+        self.ftus = []
         
         for i in range(len(self.annotations)):
-            try:
-                patch, mask = self.getPatchMask(i)
-                if self.config['masked']:
-                    out = np.array(patch*(mask/255), dtype='uint8')
-                else:
-                    out = np.copy(patch)
-                self.ftus[i] = {'im': out, 'mask': mask}
-            except:
-                pass
+            patch, mask = self.getPatchMask(i)
+            self.ftus.append(Tubule({}, patch, mask))
 
-        return
+        return self.ftus
 
     def extractFixed(self, w, h):
         outputdir = self.config['outputdir']
