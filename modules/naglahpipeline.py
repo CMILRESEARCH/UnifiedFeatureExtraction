@@ -21,6 +21,8 @@ import skimage.io
 import skimage.measure
 import skimage.color
 
+from skimage.morphology import skeletonize
+
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
@@ -417,22 +419,103 @@ class EpmFtr(FeatureBuilder):
         self.measureEpithelium(self.tubule.get_segmentation('epm'), self.tubule.mask)
 
 class LmnFtr(FeatureBuilder):
+
+    def measureLumen(self, lmn_msk, mask_):
+
+        def getContourMax(mmm):
+            mmm2 = cv2.cvtColor(mmm, cv2.COLOR_BGR2GRAY)
+            _, thre = cv2.threshold(mmm2, 20, 255, cv2.THRESH_BINARY)
+            ccc, _ = cv2.findContours(thre, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+            cnt = max(ccc, key = len)
+            return cnt
+
+        c1 = getContourMax(lmn_msk) 
+        c2 = getContourMax(mask_) 
+
+        a1 = cv2.contourArea(c1)
+        a2 = cv2.contourArea(c2)
+
+        x,y,w,h = cv2.boundingRect(c1)
+        aspect_ratio = float(w)/h
+
+        hull = cv2.convexHull(c1, returnPoints=False)
+        hull_ = cv2.convexHull(c1)
+        hull_area = cv2.contourArea(hull_)
+        solidity = float(a1)/hull_area
+
+        equi_diameter = np.sqrt(4*a1/np.pi)
+
+        a1a2 = a1/a2
+
+        (x,y),(MA,ma),angle = cv2.fitEllipse(c1)
+
+        convexityDefectsHull = cv2.convexityDefects(c1, hull)
+
+        defectsHull = [f[-1] for f in [list(k[0]) for k in list(convexityDefectsHull)]]
+
+        defectsHull_mean = mean(defectsHull)
+        defectsHull_std = stdev(defectsHull)
+
+        self.tubule.add_feature('lmn_area', a1)
+        self.tubule.add_feature('lmn_area_fraction', a1a2)
+        self.tubule.add_feature('lmn_solidity', solidity)
+        self.tubule.add_feature('lmn_hull_area', hull_area)
+        self.tubule.add_feature('lmn_aspect_ratio', aspect_ratio)
+        self.tubule.add_feature('lmn_equi_diameter', equi_diameter)
+        self.tubule.add_feature('lmn_angle', angle)
+        self.tubule.add_feature('lmn_defectsHull_mean', defectsHull_mean)
+        self.tubule.add_feature('lmn_defectsHull_std', defectsHull_std)
+
+        return
+
     def build_feature(self, ftu):
+        feature = "Luminal Fraction"
         try:
             self.tubule
         except:
             self.tubule = ftu
-        feature = "Luminal Fraction"
-        self.tubule.add_feature(feature, 445)
+        self.measureLumen(self.tubule.get_segmentation('lmn'), self.tubule.mask)
 
 class TbmFtr(FeatureBuilder):
+
+    def frmtCnt(self, cnt):
+        cntrrr = np.vstack(cnt).squeeze()  
+        n, _ = cntrrr.shape
+        cntrrrLst = []
+        for u in range(n):
+            cntrrrLst.append([cntrrr[u, 0], cntrrr[u, 1]])
+        return cntrrrLst
+    
+    def measureTbm(self, ept_msk, mask_):
+
+        ept_msk = cv2.cvtColor(ept_msk, cv2.COLOR_BGR2GRAY)
+
+        _, binary_mask = cv2.threshold(ept_msk, 127, 255, cv2.THRESH_BINARY)
+
+        dist_transform = cv2.distanceTransform(binary_mask, cv2.DIST_L2, 3)
+        
+        skeleton = skeletonize(binary_mask)
+
+        sk = list(np.transpose((skeleton==True).nonzero()))
+        distances = [dist_transform[a[0],a[1]]*2 for a in sk]
+
+        self.tubule.add_feature('tbm_mean', mean(distances))
+        self.tubule.add_feature('tbm_harmonic_mean', harmonic_mean(distances))
+        self.tubule.add_feature('tbm_median', median(distances))
+        self.tubule.add_feature('tbm_median_low', median_low(distances))
+        self.tubule.add_feature('tbm_median_high', median_high(distances))
+        self.tubule.add_feature('tbm_stdev', stdev(distances))
+        self.tubule.add_feature('tbm_variance', variance(distances))
+
+        return
+
     def build_feature(self, ftu):
+        feature = "TBM Thickness"
         try:
             self.tubule
         except:
             self.tubule = ftu
-        feature = "TBM Thickness"
-        self.tubule.add_feature(feature, 761)
+        self.measureTbm(self.tubule.get_segmentation('tbm'), self.tubule.mask)
 
 class NaglahPipeline(Pipeline):
     def __init__(self, config, builders):

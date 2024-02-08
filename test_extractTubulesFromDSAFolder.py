@@ -6,7 +6,7 @@ from modules.naglahpipeline import NaglahPipeline, Segmnt, EpmFtr, LmnFtr, TbmFt
 
 if __name__=="__main__":
     config = {
-        'svsBase' : "/blue/pinaki.sarder/nlucarelli/kpmp_new",
+        'svsBase' : "/blue/pinaki.sarder/",
         'fid' : "659eb008bd96faac30b68fff",
         'layerName': 'tubules',
         'outputdir': '/orange/pinaki.sarder/ahmed.naglah/data/unified',
@@ -41,4 +41,7 @@ if __name__=="__main__":
                                     extract_tbm])
 
             pipeline.run(tubule)
+
+            print("Tubule: ", tubule.features)
+
             print("here...")

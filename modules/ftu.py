@@ -18,11 +18,12 @@ class FTU(ABC):
         """
 
 class Tubule(FTU):
-    def __init__(self, config, patch, mask):
+    def __init__(self, config, patch, mask, bb):
         self.features = {}
         self.patch = patch
         self.mask = mask
         self.segmentation = {}
+        self.bb = bb
 
     def add_feature(self, feature, value):
         self.features[feature] = value

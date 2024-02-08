@@ -23,7 +23,7 @@ def getPatchMask(impath):
 if __name__=="__main__":
 
     config = {
-        'svsBase' : "/blue/pinaki.sarder/nlucarelli/kpmp_new",
+        'svsBase' : "/blue/pinaki.sarder/",
         'name' : 'S-1904-007292_PAS_2of2.svs',
         'fid' : "65947419bd96faac30b20352",
         'fg_annotationLayer': 'tubules',

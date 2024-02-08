@@ -97,8 +97,8 @@ class DSAItem(DSA):
         self.ftus = []
         
         for i in range(len(self.annotations)):
-            patch, mask = self.getPatchMask(i)
-            self.ftus.append(Tubule({}, patch, mask))
+            patch, mask, bb = self.getPatchMask(i)
+            self.ftus.append(Tubule({}, patch, mask, bb))
 
         return self.ftus
 
@@ -158,13 +158,15 @@ class DSAItem(DSA):
 
         self.x = int(bb[0])
         self.y = int(bb[1])
+        self.w = int(bb[2]-bb[0])
+        self.h = int(bb[3]-bb[1])
 
         level = 0
 
         patch = np.array(self.s.read_region(location, level, size_2))[:,:,:3]
         mask = cv2.cvtColor(np.array(mask, dtype='uint8'), cv2.COLOR_GRAY2RGB)
         
-        return patch, mask
+        return patch, mask, {'x':self.x, 'y':self.y, 'w':self.w, 'h':self.h}
     
     def getPatchMaskFixed(self, tid, w, h):
         polygon1 = self.annotations[tid]
