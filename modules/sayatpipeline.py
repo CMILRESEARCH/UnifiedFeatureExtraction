@@ -44,7 +44,7 @@ class FTUFtr(FeatureBuilder):
             
             feature_names = ['x1','x2','y1','y2','Average TBM Thickness','Average Cell Thickness','Luminal Fraction']
             
-            all_features = process_tubules_features(self.mask_xml, 
+            all_features = process_tubules_features(self.item.mask, 
                                                         NAMES_DICT[self.layerName], 
                                                         self.MOD, self.slide, 
                                                         mpp=self.slide.properties['tiffslide.mpp-x'], 
@@ -55,7 +55,7 @@ class FTUFtr(FeatureBuilder):
             
             feature_names = ['x1','x2','y1','y2','Arterial Area']
         
-            all_features = process_arteriol_features(self.mask_xml, 
+            all_features = process_arteriol_features(self.item.mask, 
                                                         NAMES_DICT[self.layerName], 
                                                         self.MOD, self.slide, 
                                                         mpp=self.slide.properties['tiffslide.mpp-x'])
