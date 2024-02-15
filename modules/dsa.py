@@ -7,7 +7,7 @@ import numpy as np
 import os
 import logging
 
-from modules.ftu import FTU, Tubule
+from modules.ftu import FTU
 
 import numpy as np
 
@@ -92,13 +92,13 @@ class DSAItem(DSA):
             except:
                 pass
 
-    def getTubules(self):
+    def getFTU(self):
 
         self.ftus = []
         
         for i in range(len(self.annotations)):
             patch, mask, bb = self.getPatchMask(i)
-            self.ftus.append(Tubule({}, patch, mask, bb))
+            self.ftus.append(FTU({}, patch, mask, bb))
 
         return self.ftus
 
