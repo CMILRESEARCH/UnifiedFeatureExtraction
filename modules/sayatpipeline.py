@@ -16,9 +16,7 @@ class FTUFtr(FeatureBuilder):
         self.config = config
         self.item = item
         self.layerName = layerName
-        self.MOD = MOD
-        # self.mask_xml = item.mask
-        # self.slide = item.slide
+        self.MOD = MOD        
         
     def build_feature(self):
         
@@ -46,8 +44,8 @@ class FTUFtr(FeatureBuilder):
             
             all_features = process_tubules_features(self.item.mask, 
                                                         NAMES_DICT[self.layerName], 
-                                                        self.MOD, self.slide, 
-                                                        mpp=self.slide.properties['tiffslide.mpp-x'], 
+                                                        self.MOD, self.item.slide, 
+                                                        mpp=self.item.slide.properties['tiffslide.mpp-x'], 
                                                         whitespace_threshold=self.config['whitespace_threshold']
                                                         )
         
@@ -57,8 +55,8 @@ class FTUFtr(FeatureBuilder):
         
             all_features = process_arteriol_features(self.item.mask, 
                                                         NAMES_DICT[self.layerName], 
-                                                        self.MOD, self.slide, 
-                                                        mpp=self.slide.properties['tiffslide.mpp-x'])
+                                                        self.MOD, self.item.slide, 
+                                                        mpp=self.item.slide.properties['tiffslide.mpp-x'])
             
         
         else:
@@ -88,4 +86,4 @@ class SayatPipeline(Pipeline):
 
         # Build features on selected layer
         ftus.append(ftuftr.build_feature())
-        print("Inside run:", ftus)
+        # print("Inside run:", ftus)
